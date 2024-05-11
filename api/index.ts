@@ -13,7 +13,7 @@ import {
 import express, { Application, Request, Response } from 'express';
 import admin from 'firebase-admin';
 
-// const serviceAccount = require('../litbot-9d9cd-firebase-adminsdk-e6kjs-2dbe4d4348.json');
+const serviceAccount = JSON.parse(process.env.FIREBASE_ADMIN!);
 
 import { Random } from 'random-js';
 import convert_emoji from './emoji';
