@@ -1,0 +1,21 @@
+{
+  "name": "litbot",
+  "devDependencies": {
+    "@types/connect": "^3.4.38",
+    "@types/events": "^3.0.3",
+    "@types/express": "^4.17.21",
+    "typescript": "^5.4.5"
+  },
+  "scripts": {
+    "dep": "tsc api/index.ts"
+  },
+  "dependencies": {
+    "@line/bot-sdk": "^9.2.0",
+    "events": "^3.3.0",
+    "express": "^4.19.2",
+    "firebase-admin": "^12.1.0",
+    "linebot": "^1.6.1",
+    "node-fetch": "^3.3.2",
+    "random-js": "^2.1.0"
+  }
+}
