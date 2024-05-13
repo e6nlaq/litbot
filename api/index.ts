@@ -119,7 +119,7 @@ const textEventHandler = async (
                     {
                         type: 'text',
                         text: '$',
-                        emojis: [emojis[ans]],
+                        emojis: [{ ...emojis[ans], index: 0 }],
                     },
                 ] as TextMessage[];
             } else {
