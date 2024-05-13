@@ -16,7 +16,7 @@ import admin from 'firebase-admin';
 const serviceAccount = JSON.parse(process.env.FIREBASE_ADMIN!);
 
 import { Random } from 'random-js';
-import convert_emoji from './emoji';
+import { convert_emoji, emojis } from './emoji';
 
 // Setup all LINE client and Express configurations.
 const clientConfig: ClientConfig = {
@@ -104,6 +104,26 @@ const textEventHandler = async (
                 ] as TextMessage[];
             } else {
                 return ['引数は二つ必要です。'];
+            }
+        },
+        '!rsp': async (inp, option) => {
+            if (inp.length === 0) {
+                const rand = new Random();
+
+                const ans = `rsp_${['r', 's', 'p'][rand.integer(0, 2)]}`;
+                return [
+                    {
+                        type: 'text',
+                        text: 'じゃんけんぽん!',
+                    },
+                    {
+                        type: 'text',
+                        text: '$',
+                        emojis: [emojis[ans]],
+                    },
+                ] as TextMessage[];
+            } else {
+                return ['余分な引数が含まれています(引数は0個)'];
             }
         },
     };
