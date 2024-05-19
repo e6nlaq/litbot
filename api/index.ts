@@ -22,6 +22,7 @@ const serviceAccount: Record<string, string> = JSON.parse(
 import { Random } from 'random-js';
 import { convert_emoji, emojis } from './emoji';
 import { config_type, default_config } from './config';
+import { funcs } from './args';
 
 // Setup all LINE client and Express configurations.
 const clientConfig: ClientConfig = {
@@ -100,7 +101,7 @@ const textEventHandler = async (
     config_db.set(config);
 
     const funcs: Record<
-        string,
+        funcs,
         (inp: string[], option: Set<string>) => Promise<string[] | Message[]>
     > = {
         '!rand': async (inp, option) => {
@@ -153,17 +154,24 @@ const textEventHandler = async (
                 return ['余分な引数が含まれています(引数は0個)'];
             }
         },
+        '!room': async (inp, option) => {
+            return [
+                'LitBot グループ情報',
+                `グループID: ${(event.source as webhook.GroupSource).groupId}`,
+                `Config: ${config}`,
+            ];
+        },
     };
 
     const inp = event.message.text.split(' ');
 
-    if (funcs[inp[0]] === undefined) {
+    if (funcs[inp[0] as funcs] === undefined) {
         return;
     }
 
     let ret: string[] | Message[] = [];
     try {
-        ret = await funcs[inp[0]](...format_arg(inp));
+        ret = await funcs[inp[0] as funcs](...format_arg(inp));
     } catch (err) {
         ret = [`エラー ${err} が発生しました。`];
     } finally {
