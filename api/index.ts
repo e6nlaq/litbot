@@ -88,6 +88,7 @@ const textEventHandler = async (
                 },
             ],
         });
+        return;
     }
     config = ref.child((event.source as webhook.GroupSource).groupId);
 
