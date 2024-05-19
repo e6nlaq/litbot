@@ -51,6 +51,7 @@ const client = new messagingApi.MessagingApiClient(clientConfig);
 const app: Application = express();
 
 const isTextEvent = (
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     event: any
 ): event is webhook.MessageEvent & { message: webhook.TextMessageContent } => {
     return (
@@ -134,7 +135,7 @@ const textEventHandler = async (
                 return ['引数は二つ必要です。'];
             }
         },
-        '!rsp': async (inp, option) => {
+        '!rsp': async (inp, _option) => {
             if (inp.length === 0) {
                 const rand = new Random();
 
@@ -154,11 +155,11 @@ const textEventHandler = async (
                 return ['余分な引数が含まれています(引数は0個)'];
             }
         },
-        '!room': async (inp, option) => {
+        '!room': async (_inp, _option) => {
             return [
-                'LitBot グループ情報',
-                `グループID: ${(event.source as webhook.GroupSource).groupId}`,
-                `Config: ${config}`,
+                `LitBot グループ情報\n
+                グループID: ${(event.source as webhook.GroupSource).groupId}\n
+                Config: ${JSON.stringify(config, null, 2)}`,
             ];
         },
     };
