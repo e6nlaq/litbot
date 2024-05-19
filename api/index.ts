@@ -21,6 +21,7 @@ const serviceAccount: Record<string, string> = JSON.parse(
 
 import { Random } from 'random-js';
 import { convert_emoji, emojis } from './emoji';
+import { config_type, default_config } from './config';
 
 // Setup all LINE client and Express configurations.
 const clientConfig: ClientConfig = {
@@ -40,7 +41,7 @@ admin.initializeApp({
 
 const db = getDatabase();
 const ref = db.ref('configs');
-let config: Reference;
+let config_db: Reference;
 
 // Create a new LINE SDK client.
 const client = new messagingApi.MessagingApiClient(clientConfig);
@@ -90,7 +91,13 @@ const textEventHandler = async (
         });
         return;
     }
-    config = ref.child((event.source as webhook.GroupSource).groupId);
+    config_db = ref.child((event.source as webhook.GroupSource).groupId);
+
+    const config_raw = (await config_db.once('value')).toJSON();
+    const config: config_type = Object.assign({}, default_config, config_raw);
+
+    // 設定更新
+    config_db.set(config);
 
     const funcs: Record<
         string,
