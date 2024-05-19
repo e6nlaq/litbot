@@ -157,9 +157,9 @@ const textEventHandler = async (
         },
         '!room': async (_inp, _option) => {
             return [
-                `LitBot グループ情報\n
-                グループID: ${(event.source as webhook.GroupSource).groupId}\n
-                Config: ${JSON.stringify(config, null, 2)}`,
+                `LitBot グループ情報\n` +
+                    `グループID: ${(event.source as webhook.GroupSource).groupId}\n` +
+                    `Config: ${JSON.stringify(config, null, 2)}`,
             ];
         },
     };
