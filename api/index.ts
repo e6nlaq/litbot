@@ -12,8 +12,12 @@ import {
 } from '@line/bot-sdk';
 import express, { Application, Request, Response } from 'express';
 import admin from 'firebase-admin';
+import { getDatabase } from 'firebase-admin/database';
+import type { Reference } from '@firebase/database-types';
 
-const serviceAccount = JSON.parse(process.env.FIREBASE_ADMIN!);
+const serviceAccount: Record<string, string> = JSON.parse(
+    process.env.FIREBASE_ADMIN!
+);
 
 import { Random } from 'random-js';
 import { convert_emoji, emojis } from './emoji';
@@ -34,7 +38,9 @@ admin.initializeApp({
     databaseURL: process.env.FIREBASE_DATABASE,
 });
 
-const db = admin.database();
+const db = getDatabase();
+const ref = db.ref('configs');
+let config: Reference;
 
 // Create a new LINE SDK client.
 const client = new messagingApi.MessagingApiClient(clientConfig);
@@ -71,6 +77,19 @@ const textEventHandler = async (
     if (!isTextEvent(event)) {
         return;
     }
+
+    if (event.source!.type !== 'group') {
+        await client.replyMessage({
+            replyToken: event.replyToken as string,
+            messages: [
+                {
+                    type: 'text',
+                    text: 'グループからのみ実行できます。',
+                },
+            ],
+        });
+    }
+    config = ref.child((event.source as webhook.GroupSource).groupId);
 
     const funcs: Record<
         string,
