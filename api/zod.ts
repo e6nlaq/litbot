@@ -16,7 +16,7 @@ z.setErrorMap(zodI18nMap);
 function zod_error_message(err: z.ZodError) {
     const ans = new Array<string>(err.issues.length);
     for (let i = 0; i < err.issues.length; i++) {
-        ans[i] = '・' + err.issues[i].message;
+        ans[i] = '・ ' + err.issues[i].message;
     }
     return ans;
 }
