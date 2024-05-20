@@ -62,6 +62,14 @@ export const emojis: Record<string, Required<Omit<Emoji, 'index'>>> = {
         productId: '5ac21e6c040ab15980c9b444',
         emojiId: '028',
     },
+    yes: {
+        productId: '5ac21a18040ab15980c9b43e',
+        emojiId: '029',
+    },
+    no: {
+        productId: '5ac21a18040ab15980c9b43e',
+        emojiId: '030',
+    },
 };
 
 export function convert_emoji(val: string): Array<Emoji> {

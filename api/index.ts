@@ -127,6 +127,22 @@ const textEventHandler = async (
                     `Config: ${JSON.stringify(config, null, 2)}`,
             ];
         },
+        '!yn': async (_inp, _option) => {
+            const rand = new Random();
+            const ans = rand.bool() ? 'yes' : 'no';
+
+            return [
+                {
+                    type: 'text',
+                    text: 'Yes or No!',
+                },
+                {
+                    type: 'text',
+                    text: '$',
+                    emojis: [{ ...emojis[ans], index: 0 }],
+                },
+            ];
+        },
     };
 
     const inp = event.message.text.split(' ') as [funcs, ...string[]];

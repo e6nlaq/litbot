@@ -10,6 +10,7 @@ export const args = {
     '!rand': z.tuple([randval_scheme, randval_scheme]),
     '!rsp': empty,
     '!room': empty,
+    '!yn': empty,
 };
 
 export type funcs = keyof typeof args;
