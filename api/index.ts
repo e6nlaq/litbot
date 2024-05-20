@@ -231,6 +231,22 @@ app.post(
         const results = await Promise.all(
             events.map(async (event: webhook.Event) => {
                 try {
+                    if (
+                        (event.source === undefined ||
+                            event.source.type !== 'group') &&
+                        'replyToken' in event
+                    ) {
+                        await client.replyMessage({
+                            replyToken: event.replyToken as string,
+                            messages: [
+                                {
+                                    type: 'text',
+                                    text: 'グループでのみ実行できます。',
+                                },
+                            ],
+                        });
+                        return;
+                    }
                     await textEventHandler(event);
                 } catch (err: unknown) {
                     if (err instanceof HTTPFetchError) {
