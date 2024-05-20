@@ -81,19 +81,6 @@ const textEventHandler = async (
     if (!isTextEvent(event)) {
         return;
     }
-
-    if (event.source!.type !== 'group') {
-        await client.replyMessage({
-            replyToken: event.replyToken as string,
-            messages: [
-                {
-                    type: 'text',
-                    text: 'グループからのみ実行できます。',
-                },
-            ],
-        });
-        return;
-    }
     config_db = ref.child((event.source as webhook.GroupSource).groupId);
 
     const config_raw = (await config_db.once('value')).toJSON();
