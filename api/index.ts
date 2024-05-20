@@ -182,7 +182,7 @@ const joinEventHandler = async (event: webhook.JoinEvent) => {
             {
                 type: 'text',
                 text:
-                    'こんにちは! Lit Bot と申します!\n' +
+                    'こんにちは! LitBot と申します!\n' +
                     'これから皆さんのお手伝いをして活躍していきますので、どうかよろしくおねがいします!',
             },
         ],
