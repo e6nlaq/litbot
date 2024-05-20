@@ -24,6 +24,7 @@ import { Random } from 'random-js';
 import { convert_emoji, emojis } from './emoji';
 import { config_type, default_config } from './config';
 import { args, funcs } from './args';
+import { isTextEvent } from './event';
 
 // Setup all LINE client and Express configurations.
 const clientConfig: ClientConfig = {
@@ -44,23 +45,13 @@ admin.initializeApp({
 const db = getDatabase();
 const ref = db.ref('configs');
 let config_db: Reference;
+let config: config_type;
 
 // Create a new LINE SDK client.
 const client = new messagingApi.MessagingApiClient(clientConfig);
 
 // Create a new Express application.
 const app: Application = express();
-
-const isTextEvent = (
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    event: any
-): event is webhook.MessageEvent & { message: webhook.TextMessageContent } => {
-    return (
-        event.type === 'message' &&
-        event.message &&
-        event.message.type === 'text'
-    );
-};
 
 function format_arg(arg: string[]): [string[], Set<string>] {
     const dat = new Set<string>();
@@ -75,20 +66,11 @@ function format_arg(arg: string[]): [string[], Set<string>] {
 
 // Function handler to receive the text.
 const textEventHandler = async (
-    event: webhook.Event
+    event: webhook.MessageEvent & {
+        message: webhook.TextMessageContent;
+    }
 ): Promise<MessageAPIResponseBase | undefined> => {
     // Process all variables here.
-    if (!isTextEvent(event)) {
-        return;
-    }
-    config_db = ref.child((event.source as webhook.GroupSource).groupId);
-
-    const config_raw = (await config_db.once('value')).toJSON();
-    const config: config_type = Object.assign({}, default_config, config_raw);
-
-    // 設定更新
-    config_db.set(config);
-
     type funcs_type = {
         [K in funcs]: (
             inp: z.infer<(typeof args)[K]>,
@@ -219,22 +201,31 @@ app.post(
             events.map(async (event: webhook.Event) => {
                 try {
                     if (
-                        (event.source === undefined ||
-                            event.source.type !== 'group') &&
-                        'replyToken' in event
+                        event.source === undefined ||
+                        event.source.type !== 'group'
                     ) {
-                        await client.replyMessage({
-                            replyToken: event.replyToken as string,
-                            messages: [
-                                {
-                                    type: 'text',
-                                    text: 'グループでのみ実行できます。',
-                                },
-                            ],
-                        });
+                        if ('replyToken' in event) {
+                            await client.replyMessage({
+                                replyToken: event.replyToken as string,
+                                messages: [
+                                    {
+                                        type: 'text',
+                                        text: 'グループでのみ実行できます。',
+                                    },
+                                ],
+                            });
+                        }
                         return;
                     }
-                    await textEventHandler(event);
+                    config_db = ref.child(event.source!.groupId as string);
+
+                    const config_raw = (await config_db.once('value')).toJSON();
+                    config = Object.assign({}, default_config, config_raw);
+
+                    // 設定更新
+                    config_db.set(config);
+
+                    if (isTextEvent(event)) await textEventHandler(event);
                 } catch (err: unknown) {
                     if (err instanceof HTTPFetchError) {
                         console.error(err.status);
