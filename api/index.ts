@@ -118,7 +118,7 @@ const textEventHandler = async (
                     text: '$',
                     emojis: [{ ...emojis[ans], index: 0 }],
                 },
-            ] as TextMessage[];
+            ];
         },
         '!room': async (_inp, _option) => {
             return [
