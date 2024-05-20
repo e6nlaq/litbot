@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from './zod';
 
 export const config_scheme = z.object({
     welcome: z.boolean(),

@@ -14,7 +14,7 @@ import express, { Application, Request, Response } from 'express';
 import admin from 'firebase-admin';
 import { getDatabase } from 'firebase-admin/database';
 import type { Reference } from '@firebase/database-types';
-import { z } from 'zod';
+import { z } from './zod';
 
 const serviceAccount: Record<string, string> = JSON.parse(
     process.env.FIREBASE_ADMIN!

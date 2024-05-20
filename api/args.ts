@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from './zod';
 
 const rand_min = -0x1fffffffffffff;
 const rand_max = 0x1fffffffffffff;
