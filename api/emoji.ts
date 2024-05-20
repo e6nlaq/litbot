@@ -64,11 +64,11 @@ export const emojis: Record<string, Required<Omit<Emoji, 'index'>>> = {
     },
     yes: {
         productId: '5ac21a18040ab15980c9b43e',
-        emojiId: '029',
+        emojiId: '019',
     },
     no: {
         productId: '5ac21a18040ab15980c9b43e',
-        emojiId: '030',
+        emojiId: '020',
     },
 };
 
