@@ -11,3 +11,7 @@ export function isTextEvent(
         event.message.type === 'text'
     );
 }
+
+export function isJoinEvent(event: any): event is webhook.JoinEvent {
+    return event.type === 'join';
+}

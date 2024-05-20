@@ -24,7 +24,7 @@ import { Random } from 'random-js';
 import { convert_emoji, emojis } from './emoji';
 import { config_type, default_config } from './config';
 import { args, funcs } from './args';
-import { isTextEvent } from './event';
+import { isJoinEvent, isTextEvent } from './event';
 
 // Setup all LINE client and Express configurations.
 const clientConfig: ClientConfig = {
@@ -175,6 +175,20 @@ const textEventHandler = async (
     }
 };
 
+const joinEventHandler = async (event: webhook.JoinEvent) => {
+    await client.replyMessage({
+        replyToken: event.replyToken as string,
+        messages: [
+            {
+                type: 'text',
+                text:
+                    'こんにちは! Lit Bot と申します!\n' +
+                    'これから皆さんのお手伝いをして活躍していきますので、どうかよろしくおねがいします!',
+            },
+        ],
+    });
+};
+
 // Register the LINE middleware.
 // As an alternative, you could also pass the middleware in the route handler, which is what is used here.
 // app.use(middleware(middlewareConfig));
@@ -226,6 +240,7 @@ app.post(
                     config_db.set(config);
 
                     if (isTextEvent(event)) await textEventHandler(event);
+                    if (isJoinEvent(event)) await joinEventHandler(event);
                 } catch (err: unknown) {
                     if (err instanceof HTTPFetchError) {
                         console.error(err.status);
