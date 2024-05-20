@@ -14,6 +14,7 @@ import express, { Application, Request, Response } from 'express';
 import admin from 'firebase-admin';
 import { getDatabase } from 'firebase-admin/database';
 import type { Reference } from '@firebase/database-types';
+import { z } from 'zod';
 
 const serviceAccount: Record<string, string> = JSON.parse(
     process.env.FIREBASE_ADMIN!
@@ -22,7 +23,7 @@ const serviceAccount: Record<string, string> = JSON.parse(
 import { Random } from 'random-js';
 import { convert_emoji, emojis } from './emoji';
 import { config_type, default_config } from './config';
-import { funcs } from './args';
+import { args, funcs } from './args';
 
 // Setup all LINE client and Express configurations.
 const clientConfig: ClientConfig = {
@@ -101,59 +102,54 @@ const textEventHandler = async (
     // 設定更新
     config_db.set(config);
 
-    const funcs: Record<
-        funcs,
-        (inp: string[], option: Set<string>) => Promise<string[] | Message[]>
-    > = {
+    type funcs_type = {
+        [K in funcs]: (
+            inp: z.infer<(typeof args)[K]>,
+            option: Set<string>
+        ) => Promise<string[] | Message[]>;
+    };
+
+    // type inp_type = z.infer<(typeof args)[funcs]>;
+    const funcs: funcs_type = {
         '!rand': async (inp, option) => {
             const rand = new Random();
-            if (inp.length === 2) {
-                const val = rand
-                    .integer(Number(inp[0]), Number(inp[1]))
-                    .toString();
+            const val = rand.integer(inp[0], inp[1]).toString();
 
-                if (val.length > 20) {
-                    option.add('/a');
-                }
-
-                if (option.has('/a')) {
-                    return [`${inp[0]}~${inp[1]}の中のランダムな数値!`, val];
-                }
-
-                return [
-                    {
-                        type: 'text',
-                        text: `${inp[0]}~${inp[1]}の中のランダムな数値!`,
-                    },
-                    {
-                        type: 'text',
-                        text: '$'.repeat(val.length),
-                        emojis: convert_emoji(val),
-                    },
-                ] as TextMessage[];
-            } else {
-                return ['引数は二つ必要です。'];
+            if (val.length > 20) {
+                option.add('/a');
             }
+
+            if (option.has('/a')) {
+                return [`${inp[0]}~${inp[1]}の中のランダムな数値!`, val];
+            }
+
+            return [
+                {
+                    type: 'text',
+                    text: `${inp[0]}~${inp[1]}の中のランダムな数値!`,
+                },
+                {
+                    type: 'text',
+                    text: '$'.repeat(val.length),
+                    emojis: convert_emoji(val),
+                },
+            ] as TextMessage[];
         },
-        '!rsp': async (inp, _option) => {
-            if (inp.length === 0) {
-                const rand = new Random();
+        '!rsp': async (_inp, _option) => {
+            const rand = new Random();
 
-                const ans = `rsp_${['r', 's', 'p'][rand.integer(0, 2)]}`;
-                return [
-                    {
-                        type: 'text',
-                        text: 'じゃんけんぽん!',
-                    },
-                    {
-                        type: 'text',
-                        text: '$',
-                        emojis: [{ ...emojis[ans], index: 0 }],
-                    },
-                ] as TextMessage[];
-            } else {
-                return ['余分な引数が含まれています(引数は0個)'];
-            }
+            const ans = `rsp_${['r', 's', 'p'][rand.integer(0, 2)]}`;
+            return [
+                {
+                    type: 'text',
+                    text: 'じゃんけんぽん!',
+                },
+                {
+                    type: 'text',
+                    text: '$',
+                    emojis: [{ ...emojis[ans], index: 0 }],
+                },
+            ] as TextMessage[];
         },
         '!room': async (_inp, _option) => {
             return [
@@ -164,15 +160,24 @@ const textEventHandler = async (
         },
     };
 
-    const inp = event.message.text.split(' ');
+    const inp = event.message.text.split(' ') as [funcs, ...string[]];
 
-    if (funcs[inp[0] as funcs] === undefined) {
+    if (funcs[inp[0]] === undefined) {
         return;
     }
 
     let ret: string[] | Message[] = [];
     try {
-        ret = await funcs[inp[0] as funcs](...format_arg(inp));
+        const formated_inp = format_arg(inp);
+
+        // type command_type<T in funcs> = (typeof funcs)[T];
+        // const command: command_type<(typeof inp)[0]>;
+
+        ret = await funcs[inp[0]](
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            args[inp[0]].parse(formated_inp[0]) as any,
+            formated_inp[1]
+        );
     } catch (err) {
         ret = [`エラー ${err} が発生しました。`];
     } finally {
