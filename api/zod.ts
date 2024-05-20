@@ -8,7 +8,7 @@ import translation from 'zod-i18n-map/locales/ja/zod.json';
 i18next.init({
     lng: 'ja',
     resources: {
-        es: { zod: translation },
+        ja: { zod: translation },
     },
 });
 z.setErrorMap(zodI18nMap);
