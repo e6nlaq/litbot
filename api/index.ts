@@ -14,7 +14,7 @@ import express, { Application, Request, Response } from 'express';
 import admin from 'firebase-admin';
 import { getDatabase } from 'firebase-admin/database';
 import type { Reference } from '@firebase/database-types';
-import { z } from './zod';
+import { z, zod_error_message } from './zod';
 
 const serviceAccount: Record<string, string> = JSON.parse(
     process.env.FIREBASE_ADMIN!
@@ -179,7 +179,12 @@ const textEventHandler = async (
             formated_inp[1]
         );
     } catch (err) {
-        ret = [`エラー ${err} が発生しました。`];
+        if (err instanceof z.ZodError) {
+            ret = [
+                `以下のエラーが発生しました。\n` +
+                    zod_error_message(err).join('\n'),
+            ];
+        } else ret = [`エラー ${err} が発生しました。`];
     } finally {
         // Process all message related variables here.
         // Create a new message.
