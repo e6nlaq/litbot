@@ -231,7 +231,7 @@ const memberJoinedEventHandler = async (
                 {
                     type: 'text',
                     text:
-                        `${joinusers.join('さん、')}さん。\n` +
+                        `こんにちは、${joinusers.join('さん、')}さん。\n` +
                         `ようこそ、${gruopinfo.groupName}へ!`,
                 },
             ],
