@@ -24,7 +24,7 @@ import { Random } from 'random-js';
 import { convert_emoji, emojis } from './emoji';
 import { config_type, default_config } from './config';
 import { args, funcs } from './args';
-import { isJoinEvent, isTextEvent } from './event';
+import { isJoinEvent, isMemberJoinedEvent, isTextEvent } from './event';
 
 // Setup all LINE client and Express configurations.
 const clientConfig: ClientConfig = {
@@ -205,6 +205,40 @@ const joinEventHandler = async (event: webhook.JoinEvent) => {
     });
 };
 
+const memberJoinedEventHandler = async (
+    event: webhook.MemberJoinedEvent & { source: webhook.GroupSource }
+) => {
+    if (config.welcome) {
+        const joinusers: string[] = [];
+        for (let i = 0; i < event.joined.members.length; ++i) {
+            if (event.joined.members[i].userId !== undefined) {
+                joinusers.push(
+                    await (
+                        await client.getGroupMemberProfile(
+                            event.source.groupId,
+                            event.joined.members[i].userId!
+                        )
+                    ).displayName
+                );
+            }
+        }
+
+        const gruopinfo = await client.getGroupSummary(event.source.groupId);
+
+        await client.replyMessage({
+            replyToken: event.replyToken,
+            messages: [
+                {
+                    type: 'text',
+                    text:
+                        `${joinusers.join('さん、')}さん。\n` +
+                        `ようこそ、${gruopinfo.groupName}へ!`,
+                },
+            ],
+        });
+    }
+};
+
 // Register the LINE middleware.
 // As an alternative, you could also pass the middleware in the route handler, which is what is used here.
 // app.use(middleware(middlewareConfig));
@@ -257,6 +291,8 @@ app.post(
 
                     if (isTextEvent(event)) await textEventHandler(event);
                     if (isJoinEvent(event)) await joinEventHandler(event);
+                    if (isMemberJoinedEvent(event))
+                        await memberJoinedEventHandler(event);
                 } catch (err: unknown) {
                     if (err instanceof HTTPFetchError) {
                         console.error(err.status);

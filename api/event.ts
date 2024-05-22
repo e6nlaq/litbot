@@ -15,3 +15,9 @@ export function isTextEvent(
 export function isJoinEvent(event: any): event is webhook.JoinEvent {
     return event.type === 'join';
 }
+
+export function isMemberJoinedEvent(
+    event: any
+): event is webhook.MemberJoinedEvent & { source: webhook.GroupSource } {
+    return event.type === 'memberJoined';
+}
