@@ -12,6 +12,9 @@ jobs:
               with:
                   bun-version: latest
 
+            - name: What
+              run: tree
+
             - name: Install deps
               run: bun install
 
