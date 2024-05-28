@@ -171,7 +171,7 @@ const textEventHandler = async (
             ];
         } else ret = [`エラー ${err} が発生しました。`];
         ret.push(
-            `詳しくはこちらをご覧ください: https://e6nlaq.github.io/litbot-docs/docs/${inp[0]}`
+            `詳しくはこちらをご覧ください: https://e6nlaq.github.io/litbot-docs/docs/${inp[0].substring(1)}`
         );
     } finally {
         // Process all message related variables here.
