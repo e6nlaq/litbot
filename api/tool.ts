@@ -1,7 +1,9 @@
+// 0埋め
 export function zfill(x: number, n: number): string {
     return String(x).padStart(n, '0');
 }
 
+// オプションと引数を分離
 export function format_arg(arg: string[]): [string[], Set<string>] {
     const dat = new Set<string>();
     const list: string[] = [];
