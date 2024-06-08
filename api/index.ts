@@ -25,6 +25,7 @@ import { convert_emoji, emojis } from './emoji';
 import { config_type, default_config } from './config';
 import { args, funcs } from './args';
 import { isJoinEvent, isMemberJoinedEvent, isTextEvent } from './event';
+import { format_arg, zfill } from './tool';
 
 // Setup all LINE client and Express configurations.
 const clientConfig: ClientConfig = {
@@ -52,17 +53,6 @@ const client = new messagingApi.MessagingApiClient(clientConfig);
 
 // Create a new Express application.
 const app: Application = express();
-
-function format_arg(arg: string[]): [string[], Set<string>] {
-    const dat = new Set<string>();
-    const list: string[] = [];
-    for (let i = 1; i < arg.length; ++i) {
-        if (arg[i][0] !== '/') list.push(arg[i]);
-        else dat.add(arg[i]);
-    }
-
-    return [list, dat];
-}
 
 // Function handler to receive the text.
 const textEventHandler = async (
@@ -155,7 +145,7 @@ const textEventHandler = async (
 
             return [
                 '使用時刻を以下の通り更新しました。',
-                `${inp[0]}:${inp[1]} - ${inp[2]}:${inp[3]}`,
+                `${inp[0]}:${zfill(inp[1], 2)} - ${inp[2]}:${zfill(inp[3], 2)}`,
             ];
         },
     };
