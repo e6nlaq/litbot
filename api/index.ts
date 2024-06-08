@@ -143,6 +143,21 @@ const textEventHandler = async (
                 },
             ];
         },
+        '!usetime': async (inp, _option) => {
+            config = Object.assign({}, config, {
+                use_sh: inp[0],
+                use_sm: inp[1],
+                use_eh: inp[2],
+                use_em: inp[3],
+            } as config_type);
+
+            config_db.set(config);
+
+            return [
+                '使用時刻を以下の通り更新しました。',
+                `${inp[0]}:${inp[1]} - ${inp[2]}:${inp[3]}`,
+            ];
+        },
     };
 
     const inp = event.message.text.split(' ') as [funcs, ...string[]];
