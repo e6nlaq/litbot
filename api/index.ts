@@ -7,9 +7,9 @@ import {
     MiddlewareConfig,
     webhook,
     HTTPFetchError,
-    Message,
     TextMessage,
 } from '@line/bot-sdk';
+import { Message } from '@line/bot-sdk/dist/messaging-api/api';
 import express, { Application, Request, Response } from 'express';
 import admin from 'firebase-admin';
 import { getDatabase } from 'firebase-admin/database';
@@ -188,7 +188,7 @@ const textEventHandler = async (
         } else {
             await client.replyMessage({
                 replyToken: event.replyToken as string,
-                messages: ret as Message[],
+                messages: [...(ret as Message[])],
             });
         }
     }
