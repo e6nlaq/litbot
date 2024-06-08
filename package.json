@@ -1,6 +1,5 @@
 {
     "name": "litbot",
-    "type": "module",
     "devDependencies": {
         "@eslint/js": "^9.4.0",
         "@firebase/database-types": "^1.0.3",
