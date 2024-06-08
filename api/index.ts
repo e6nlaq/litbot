@@ -21,7 +21,7 @@ const serviceAccount: Record<string, string> = JSON.parse(
 );
 
 import { Random } from 'random-js';
-import { convert_emoji, emojis } from './emoji';
+import { convert_emoji, emojis, single_emoji } from './emoji';
 import { config_type, default_config } from './config';
 import { args, funcs } from './args';
 import { isJoinEvent, isMemberJoinedEvent, isTextEvent } from './event';
@@ -205,6 +205,16 @@ const joinEventHandler = async (event: webhook.JoinEvent) => {
         messages: [
             {
                 type: 'text',
+                text: '$',
+                emojis: [
+                    {
+                        index: 0,
+                        ...single_emoji('hi'),
+                    },
+                ],
+            },
+            {
+                type: 'text',
                 text:
                     'こんにちは! LitBot と申します!\n' +
                     'これから皆さんのお手伝いをして活躍していきますので、どうかよろしくおねがいします!',
@@ -236,6 +246,16 @@ const memberJoinedEventHandler = async (
         await client.replyMessage({
             replyToken: event.replyToken,
             messages: [
+                {
+                    type: 'text',
+                    text: '$',
+                    emojis: [
+                        {
+                            index: 0,
+                            ...single_emoji('hi'),
+                        },
+                    ],
+                },
                 {
                     type: 'text',
                     text:

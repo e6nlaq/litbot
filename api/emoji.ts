@@ -1,6 +1,8 @@
 import { Emoji } from '@line/bot-sdk/dist/messaging-api/api';
 
-export const emojis: Record<string, Required<Omit<Emoji, 'index'>>> = {
+export type EmojiId = Required<Omit<Emoji, 'index'>>;
+
+export const emojis: Record<string, EmojiId> = {
     '1': {
         productId: '5ac21a8c040ab15980c9b43f',
         emojiId: '053',
@@ -70,6 +72,10 @@ export const emojis: Record<string, Required<Omit<Emoji, 'index'>>> = {
         productId: '5ac21a18040ab15980c9b43e',
         emojiId: '020',
     },
+    hi: {
+        productId: '5ac21cc5031a6752fb806d5c',
+        emojiId: '046',
+    },
 };
 
 export function convert_emoji(val: string): Array<Emoji> {
@@ -78,4 +84,8 @@ export function convert_emoji(val: string): Array<Emoji> {
         ret[i] = { index: i, ...emojis[val[i]] };
     }
     return ret;
+}
+
+export function single_emoji(id: string): EmojiId {
+    return { emojiId: emojis[id].emojiId, productId: emojis[id].productId };
 }
