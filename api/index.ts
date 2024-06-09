@@ -366,7 +366,7 @@ app.post(
 
                     // 時間制限確認
                     const use_s = time(config.use_sh, config.use_sm);
-                    const use_e = time(config.use_eh, config.use_em);
+                    const use_e = time(config.use_eh, config.use_em, 59);
 
                     is_useable = dayjs()
                         .tz()
