@@ -26,6 +26,7 @@ import { config_type, default_config } from './config';
 import { args, funcs } from './args';
 import { isJoinEvent, isMemberJoinedEvent, isTextEvent } from './event';
 import { format_arg, zfill } from './tool';
+import { time } from './date';
 
 // Setup all LINE client and Express configurations.
 const clientConfig: ClientConfig = {
@@ -134,6 +135,13 @@ const textEventHandler = async (
             ];
         },
         '!usetime': async (inp, _option) => {
+            const use_s = time(inp[0], inp[1]);
+            const use_e = time(inp[2], inp[3]);
+
+            if (use_s.isAfter(use_e)) {
+                throw new Error('日付をまたいだ設定はできません。');
+            }
+
             config = Object.assign({}, config, {
                 use_sh: inp[0],
                 use_sm: inp[1],
