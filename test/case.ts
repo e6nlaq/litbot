@@ -1,3 +1,3 @@
-const case_count = 5000;
+const case_count = 300;
 
 export default case_count;

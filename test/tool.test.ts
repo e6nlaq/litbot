@@ -1,3 +1,5 @@
+import { faker } from '@faker-js/faker';
+
 import case_count from './case';
 import { zfill, remove_empty } from 'api/tool';
 
@@ -15,6 +17,13 @@ describe('remove_empty', () => {
             expect(remove_empty(new Array<string>(n).fill(''))).toStrictEqual(
                 [] as string[]
             );
+        }
+    });
+
+    test('all_nonempty', () => {
+        for (let n = 1; n <= case_count; n++) {
+            const arr = faker.word.words(n).split(' ');
+            expect(remove_empty(arr)).toEqual(arr);
         }
     });
 });
