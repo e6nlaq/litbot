@@ -18,6 +18,7 @@ import { Random } from 'random-js';
 import dayjs from 'dayjs';
 import isBetween from 'dayjs/plugin/isBetween';
 import timezone from 'dayjs/plugin/timezone';
+import utc from 'dayjs/plugin/utc';
 
 const serviceAccount: Record<string, string> = JSON.parse(
     process.env.FIREBASE_ADMIN!
@@ -61,6 +62,7 @@ let config: config_type;
 
 // day.js Plugin
 dayjs.extend(isBetween);
+dayjs.extend(utc);
 dayjs.extend(timezone);
 
 dayjs.tz.setDefault(zone);
