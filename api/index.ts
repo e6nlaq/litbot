@@ -28,7 +28,7 @@ const serviceAccount: Record<string, string> = JSON.parse(
 import { z, zod_error_message } from './zod';
 import { convert_emoji, EmojiName, emojis, single_emoji } from './emoji';
 import { config_type, default_config } from './config';
-import { args, funcs } from './args';
+import { args, funcs, jp_funcs } from './args';
 import {
     isJoinEvent,
     isMemberJoinedEvent,
@@ -194,6 +194,10 @@ const textEventHandler = async (
         .toString();
 
     const inp = remove_empty(fixed_text.split(' ')) as [funcs, ...string[]];
+
+    if (jp_funcs[inp[0]] !== undefined) {
+        inp[0] = jp_funcs[inp[0]];
+    }
 
     if (inp[0] !== '!usetime' && !is_useable) {
         if (isReplyableEvent(event)) {

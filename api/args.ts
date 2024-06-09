@@ -16,3 +16,7 @@ export const args = {
 };
 
 export type funcs = keyof typeof args;
+
+export const jp_funcs: Record<string, funcs> = {
+    '!いえの': '!yn',
+};
