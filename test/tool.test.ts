@@ -1,4 +1,4 @@
-import { faker } from '@faker-js/faker';
+// import { faker } from '@faker-js/faker';
 
 import case_count from './case';
 import { zfill, remove_empty } from 'api/tool';
@@ -22,7 +22,7 @@ describe('remove_empty', () => {
 
     test('all_nonempty', () => {
         for (let n = 1; n <= case_count; n++) {
-            const arr = faker.word.words(n).split(' ');
+            const arr = new Array<string>(n).fill('hello');
             expect(remove_empty(arr)).toEqual(arr);
         }
     });
