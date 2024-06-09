@@ -21,3 +21,9 @@ export function isMemberJoinedEvent(
 ): event is webhook.MemberJoinedEvent & { source: webhook.GroupSource } {
     return event.type === 'memberJoined';
 }
+
+export function isReplyableEvent(
+    event: any
+): event is webhook.Event & { replyToken: string } {
+    return typeof event.replyToken === 'string';
+}

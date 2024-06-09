@@ -14,19 +14,27 @@ import express, { Application, Request, Response } from 'express';
 import admin from 'firebase-admin';
 import { getDatabase } from 'firebase-admin/database';
 import type { Reference } from '@firebase/database-types';
-import { z, zod_error_message } from './zod';
+import { Random } from 'random-js';
+import dayjs from 'dayjs';
+import isBetween from 'dayjs/plugin/isBetween';
 
 const serviceAccount: Record<string, string> = JSON.parse(
     process.env.FIREBASE_ADMIN!
 );
 
-import { Random } from 'random-js';
-import { convert_emoji, emojis, single_emoji } from './emoji';
+import { z, zod_error_message } from './zod';
+import { convert_emoji, EmojiName, emojis, single_emoji } from './emoji';
 import { config_type, default_config } from './config';
 import { args, funcs } from './args';
-import { isJoinEvent, isMemberJoinedEvent, isTextEvent } from './event';
+import {
+    isJoinEvent,
+    isMemberJoinedEvent,
+    isTextEvent,
+    isReplyableEvent,
+} from './event';
 import { format_arg, zfill } from './tool';
 import { time } from './date';
+import { outtime } from './message';
 
 // Setup all LINE client and Express configurations.
 const clientConfig: ClientConfig = {
@@ -37,6 +45,7 @@ const middlewareConfig: MiddlewareConfig = {
     channelSecret: process.env.CHANNEL_SECRET || '',
 };
 
+// Firebase
 const PORT = process.env.PORT || 3000;
 
 admin.initializeApp({
@@ -49,11 +58,18 @@ const ref = db.ref('configs');
 let config_db: Reference;
 let config: config_type;
 
+// day.js Plugin
+dayjs.extend(isBetween);
+let is_useable = true;
+
 // Create a new LINE SDK client.
 const client = new messagingApi.MessagingApiClient(clientConfig);
 
 // Create a new Express application.
 const app: Application = express();
+
+// 時間外
+let outtime_message: Message;
 
 // Function handler to receive the text.
 const textEventHandler = async (
@@ -91,14 +107,15 @@ const textEventHandler = async (
                 {
                     type: 'text',
                     text: '$'.repeat(val.length),
-                    emojis: convert_emoji(val),
+                    emojis: convert_emoji(val.split('') as EmojiName[]),
                 },
             ] as TextMessage[];
         },
         '!rsp': async (_inp, _option) => {
             const rand = new Random();
 
-            const ans = `rsp_${['r', 's', 'p'][rand.integer(0, 2)]}`;
+            const ans =
+                `rsp_${['r', 's', 'p'][rand.integer(0, 2)]}` as `rsp_${'r' | 's' | 'p'}`;
             return [
                 {
                     type: 'text',
@@ -159,6 +176,17 @@ const textEventHandler = async (
     };
 
     const inp = event.message.text.split(' ') as [funcs, ...string[]];
+
+    if (inp[0] !== '!usetime' && !is_useable) {
+        if (isReplyableEvent(event)) {
+            await client.replyMessage({
+                replyToken: event.replyToken,
+                messages: [outtime_message],
+                notificationDisabled: true,
+            });
+        }
+        return;
+    }
 
     if (funcs[inp[0]] === undefined) {
         return;
@@ -317,6 +345,7 @@ app.post(
                         }
                         return;
                     }
+                    // 設定読み込み
                     config_db = ref.child(event.source!.groupId as string);
 
                     const config_raw = (await config_db.once('value')).toJSON();
@@ -325,9 +354,30 @@ app.post(
                     // 設定更新
                     config_db.set(config);
 
+                    // 時間制限確認
+                    const use_s = time(config.use_sh, config.use_sm);
+                    const use_e = time(config.use_eh, config.use_em);
+
+                    is_useable = dayjs().isBetween(use_s, use_e, null, '[]');
+                    outtime_message = outtime(
+                        config.use_sh,
+                        config.use_sm,
+                        config.use_eh,
+                        config.use_em
+                    );
+
                     if (isTextEvent(event)) await textEventHandler(event);
-                    if (isJoinEvent(event)) await joinEventHandler(event);
-                    if (isMemberJoinedEvent(event))
+                    else if (!is_useable) {
+                        if (isReplyableEvent(event)) {
+                            await client.replyMessage({
+                                replyToken: event.replyToken,
+                                notificationDisabled: true,
+                                messages: [outtime_message],
+                            });
+                        }
+                    } else if (isJoinEvent(event))
+                        await joinEventHandler(event);
+                    else if (isMemberJoinedEvent(event))
                         await memberJoinedEventHandler(event);
                 } catch (err: unknown) {
                     if (err instanceof HTTPFetchError) {
