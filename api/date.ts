@@ -1,7 +1,13 @@
 import dayjs from 'dayjs';
+import timezone from 'dayjs/plugin/timezone';
+
+dayjs.extend(timezone);
+dayjs.tz.setDefault('Asia/Tokyo');
+
+export const zone = 'Asia/Tokyo';
 
 export function time(h: number, m: number = 0, s: number = 0): dayjs.Dayjs {
-    const date = dayjs().set('hour', h).set('minute', m).set('second', s);
+    const date = dayjs().tz().set('hour', h).set('minute', m).set('second', s);
 
     return date;
 }

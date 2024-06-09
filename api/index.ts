@@ -17,6 +17,7 @@ import type { Reference } from '@firebase/database-types';
 import { Random } from 'random-js';
 import dayjs from 'dayjs';
 import isBetween from 'dayjs/plugin/isBetween';
+import timezone from 'dayjs/plugin/timezone';
 
 const serviceAccount: Record<string, string> = JSON.parse(
     process.env.FIREBASE_ADMIN!
@@ -33,7 +34,7 @@ import {
     isReplyableEvent,
 } from './event';
 import { format_arg, zfill } from './tool';
-import { time } from './date';
+import { time, zone } from './date';
 import { outtime } from './message';
 
 // Setup all LINE client and Express configurations.
@@ -60,6 +61,9 @@ let config: config_type;
 
 // day.js Plugin
 dayjs.extend(isBetween);
+dayjs.extend(timezone);
+
+dayjs.tz.setDefault(zone);
 let is_useable = true;
 
 // Create a new LINE SDK client.
@@ -174,7 +178,7 @@ const textEventHandler = async (
             ];
         },
         '!now': async (_inp, _option) => {
-            if (config.debug) return [dayjs().format()];
+            if (config.debug) return [dayjs().tz().format()];
             else return [];
         },
     };
@@ -362,7 +366,9 @@ app.post(
                     const use_s = time(config.use_sh, config.use_sm);
                     const use_e = time(config.use_eh, config.use_em);
 
-                    is_useable = dayjs().isBetween(use_s, use_e, null, '[]');
+                    is_useable = dayjs()
+                        .tz()
+                        .isBetween(use_s, use_e, null, '[]');
                     outtime_message = outtime(
                         config.use_sh,
                         config.use_sm,
