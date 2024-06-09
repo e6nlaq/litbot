@@ -18,5 +18,18 @@ export const args = {
 export type funcs = keyof typeof args;
 
 export const jp_funcs: Record<string, funcs> = {
+    '!らん': '!rand',
+    '!らんすう': '!rand',
+    '!らんだむ': '!rand',
+
+    '!じゃん': '!rsp',
+
+    '!へや': '!room',
+
     '!いえの': '!yn',
+
+    '!りようじかん': '!usetime',
+
+    '!なう': '!now',
+    '!いま': '!now',
 };
