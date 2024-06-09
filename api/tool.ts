@@ -14,3 +14,13 @@ export function format_arg(arg: string[]): [string[], Set<string>] {
 
     return [list, dat];
 }
+
+// 空の要素を除外
+export function remove_empty(arr: string[]): string[] {
+    const res: string[] = [];
+    for (let i = 0; i < arr.length; ++i) {
+        if (arr[i] !== '') res.push(arr[i]);
+    }
+
+    return res;
+}

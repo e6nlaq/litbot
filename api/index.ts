@@ -19,6 +19,7 @@ import dayjs from 'dayjs';
 import isBetween from 'dayjs/plugin/isBetween';
 import timezone from 'dayjs/plugin/timezone';
 import utc from 'dayjs/plugin/utc';
+import moji from 'moji';
 
 const serviceAccount: Record<string, string> = JSON.parse(
     process.env.FIREBASE_ADMIN!
@@ -34,7 +35,7 @@ import {
     isTextEvent,
     isReplyableEvent,
 } from './event';
-import { format_arg, zfill } from './tool';
+import { format_arg, zfill, remove_empty } from './tool';
 import { time, zone } from './date';
 import { outtime } from './message';
 
@@ -186,7 +187,13 @@ const textEventHandler = async (
         },
     };
 
-    const inp = event.message.text.split(' ') as [funcs, ...string[]];
+    // 半角変換
+    const fixed_text = moji(event.message.text)
+        .convert('ZE', 'HE')
+        .convert('ZS', 'HS')
+        .toString();
+
+    const inp = remove_empty(fixed_text.split(' ')) as [funcs, ...string[]];
 
     if (inp[0] !== '!usetime' && !is_useable) {
         if (isReplyableEvent(event)) {
