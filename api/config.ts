@@ -7,6 +7,7 @@ export const config_scheme = z.object({
     use_sm: minute,
     use_eh: hour,
     use_em: minute,
+    debug: z.boolean(),
 });
 
 export type config_type = z.infer<typeof config_scheme>;
@@ -17,4 +18,5 @@ export const default_config: config_type = {
     use_sm: 0,
     use_eh: 23,
     use_em: 59,
+    debug: false,
 };

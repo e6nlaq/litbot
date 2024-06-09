@@ -12,6 +12,7 @@ export const args = {
     '!room': empty,
     '!yn': empty,
     '!usetime': z.tuple([hour_c, minute_c, hour_c, minute_c]),
+    '!now': empty,
 };
 
 export type funcs = keyof typeof args;

@@ -173,6 +173,10 @@ const textEventHandler = async (
                 `${inp[0]}:${zfill(inp[1], 2)} - ${inp[2]}:${zfill(inp[3], 2)}`,
             ];
         },
+        '!now': async (_inp, _option) => {
+            if (config.debug) return [dayjs().format()];
+            else return [];
+        },
     };
 
     const inp = event.message.text.split(' ') as [funcs, ...string[]];
