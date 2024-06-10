@@ -181,9 +181,7 @@ const textEventHandler = async (
             ];
         },
         '!now': async (_inp, _option) => {
-            if (config.debug)
-                return [dayjs().tz().format('YYYY.MM.DD HH:mm:ss.SSS')];
-            else return [];
+            return [dayjs().tz().format('YYYY.MM.DD HH:mm:ss.SSS')];
         },
     };
 
