@@ -22,7 +22,7 @@
     "@line/bot-sdk": "^9.2.2",
     "dayjs": "^1.11.11",
     "express": "^4.19.2",
-    "firebase-admin": "^12.2.0",
+    "firebase-admin": "^13.0.0",
     "i18next": "^23.11.5",
     "moji": "^0.5.1",
     "random-js": "^2.1.0",
