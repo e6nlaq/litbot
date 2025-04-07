@@ -21,7 +21,7 @@
   "dependencies": {
     "@line/bot-sdk": "^9.2.2",
     "dayjs": "^1.11.11",
-    "express": "^4.19.2",
+    "express": "^5.1.0",
     "firebase-admin": "^13.0.0",
     "i18next": "^24.2.0",
     "moji": "^0.5.1",
